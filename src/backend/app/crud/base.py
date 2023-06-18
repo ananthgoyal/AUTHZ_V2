@@ -26,7 +26,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self.model = model
 
     def read(self, db: Session, id: Any) -> Optional[ModelType]:
-        #db.query(self.model).get(id)
+        #return db.get(self.model, id)
         return db.query(self.model).filter(self.model.id == id).first()
 
     def read_all(
