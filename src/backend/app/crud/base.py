@@ -42,7 +42,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return db_obj
 
     def update(self,db: Session, *, obj_id: str, obj_in: Union[UpdateSchemaType, Dict[str, Any]]) -> ModelType:
-        restricted = ["createdBy", "createdOn", "id"]
+        restricted = ["createdBy", "createdOn", "id"] #immutable attributes once created
         db_obj = db.get(self.model, obj_id)
         obj_data = jsonable_encoder(db_obj)
         if isinstance(obj_in, dict):
@@ -50,7 +50,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         else:
             update_data = obj_in.dict(exclude_unset=True)
         for field in obj_data:
-            if field in update_data and field not in restricted:
+            if field in update_data and field not in restricted: #bypass any attempt to change immutable attributes
                 setattr(db_obj, field, update_data[field])
         db.add(db_obj)
         db.commit()

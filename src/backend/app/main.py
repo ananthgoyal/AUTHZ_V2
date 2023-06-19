@@ -19,7 +19,7 @@ roleCrud = CRUD_Role()
 def index():
     return {"message": "Authz V2"}
 
-
+"""Create a Role"""
 @app.post('/roles', status_code = status.HTTP_201_CREATED)
 def create_role(role: Role):
     return roleCrud.create(db = session, obj_in=role)
@@ -29,13 +29,16 @@ def create_role(role: Role):
 def read_all_roles():
     return roleCrud.read_all(session)
 
+"""Read Single Role"""
 @app.get('/roles/{role_guid}', response_model = Role, status_code = 200)
 def read_role(role_guid: str):
     return roleCrud.read(session, role_guid)
 
+"""Update a Role"""
 @app.put('/roles/{role_guid}', response_model = Role, status_code=status.HTTP_200_OK)
 def update_role(role_guid:str, role: Role):
     return roleCrud.update(db = session, obj_id = role_guid, obj_in=role)
+
 
 
 def init_db():
