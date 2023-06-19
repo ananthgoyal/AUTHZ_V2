@@ -33,6 +33,11 @@ def read_all_roles():
 def read_role(role_guid: str):
     return roleCrud.read(session, role_guid)
 
+@app.put('/roles/{role_guid}', response_model = Role, status_code=status.HTTP_200_OK)
+def update_role(role_guid:str, role: Role):
+    return roleCrud.update(db = session, obj_id = role_guid, obj_in=role)
+
+
 def init_db():
     Base.metadata.create_all(engine)
 
