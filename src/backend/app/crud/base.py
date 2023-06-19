@@ -1,3 +1,4 @@
+from datetime import datetime
 from db.base_class import Base  
 from models.Role import Role
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
@@ -42,7 +43,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return db_obj
 
     def update(self,db: Session, *, obj_id: str, obj_in: Union[UpdateSchemaType, Dict[str, Any]]) -> ModelType:
-        restricted = ["createdBy", "createdOn", "id"] #immutable attributes once created
+        restricted = ["createdBy", "createdOn", "id", "version", "lastModifiedBy", "lastModifiedOn"] #immutable attributes once created
         db_obj = db.get(self.model, obj_id)
         obj_data = jsonable_encoder(db_obj)
         if isinstance(obj_in, dict):
@@ -52,12 +53,17 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         for field in obj_data:
             if field in update_data and field not in restricted: #bypass any attempt to change immutable attributes
                 setattr(db_obj, field, update_data[field])
+        setattr(db_obj, "lastModifiedOn", datetime.now())
+        curr_version = getattr(db_obj, "version")
+        if getattr(db.get(self.model, obj_id), "version") != curr_version:
+            return {"message": "Version Mismatch Error"} #return mismatch error
+        setattr(db_obj, "version", curr_version + 1)
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
         return db_obj
 
-    def remove(self, db: Session, *, id: int) -> ModelType:
+    def delete(self, db: Session, *, id: str) -> ModelType:
         obj = db.query(self.model).get(id)
         db.delete(obj)
         db.commit()

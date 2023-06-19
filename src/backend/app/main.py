@@ -39,6 +39,10 @@ def read_role(role_guid: str):
 def update_role(role_guid:str, role: Role):
     return roleCrud.update(db = session, obj_id = role_guid, obj_in=role)
 
+"""Delete a Role"""
+@app.delete('/roles/{role_guid}')
+def delete_role(role_guid: str):
+    return roleCrud.delete(session, id = role_guid)
 
 
 def init_db():

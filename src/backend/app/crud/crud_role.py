@@ -21,6 +21,7 @@ class CRUD_Role(CRUDBase):
         super().__init__(models.Role.Role)
     
     def update(self, db: Session, *, obj_id: str, obj_in: Union[UpdateSchemaType, Dict[str, Any]]) -> ModelType:
-        return super().update(db, obj_id=obj_id, obj_in = obj_in)
+        pers_obj = super().update(db, obj_id=obj_id, obj_in = obj_in)
+        return pers_obj
         #call update on super and then handle specifics towards the role class (permissions, tags, description, etc.)
     
