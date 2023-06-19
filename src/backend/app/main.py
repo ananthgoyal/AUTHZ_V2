@@ -1,13 +1,19 @@
+from urllib import response
 from db.session import SessionLocal
 from fastapi import FastAPI, Request, Depends, Form, status, HTTPException
 from fastapi.encoders import jsonable_encoder
 from db.session import Base, engine
-from models.Role import Role
+from schemas.Role import Role
+from schemas.Persistent import Persistent
+import models
 from typing import List
 from crud.crud_role import CRUD_Role
+from crud.base import CRUDBase
 
 app = FastAPI()
 session = SessionLocal()
+
+roleCrud = CRUD_Role()
 
 @app.get('/')
 def index():
@@ -15,15 +21,17 @@ def index():
 
 
 @app.post('/roles', status_code = status.HTTP_201_CREATED)
-def passed():
-    pass
+def create_role(role: Role):
+    return roleCrud.create(db = session, obj_in=role)
 
 """Read All Roles"""
 @app.get('/roles', response_model = List[Role], status_code = 200)
-def get_all_roles():
-    pass
+def read_all_roles():
+    return roleCrud.read_all(session)
 
-
+@app.get('/roles/{role_guid}', response_model = Role, status_code = 200)
+def read_role(role_guid: str):
+    return roleCrud.read(session, role_guid)
 
 def init_db():
     Base.metadata.create_all(engine)

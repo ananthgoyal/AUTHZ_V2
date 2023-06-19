@@ -1,12 +1,12 @@
-from app.db.base_class import Base  
-from app.models.Role import Role
+from db.base_class import Base  
+from models.Role import Role
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from app.db.base_class import Base
+from db.base_class import Base
 
 ModelType = TypeVar("ModelType", bound=Base)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
@@ -26,8 +26,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self.model = model
 
     def read(self, db: Session, id: Any) -> Optional[ModelType]:
-        #return db.get(self.model, id)
-        return db.query(self.model).filter(self.model.id == id).first()
+        return db.get(self.model, id)
 
     def read_all(
         self, db: Session, *, skip: int = 0, limit: int = 100

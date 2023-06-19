@@ -1,15 +1,16 @@
 #!/usr/bin/python
 #-*- coding: utf-8 -*-
 from typing import List
-from Persistent import Persistent
+from schemas.Persistent import Persistent
 from pydantic import Field
 
 
 class Role(Persistent):
     """Is an organized set of permissions intended to reflect an organization function."""
     name: str = "" #Name of the Role
-    permissions: List[int] = [] #List of all unique Int ID's of permssions the role contains
+    #permissions: List[int] = [] #List of all unique Int ID's of permissions the role contains
     tags: List[str] = [] #List of strings indicating all associated tags with role
+    description: str = "" #Description of the role
 
     class Config:
         orm_mode = True
@@ -40,6 +41,8 @@ class Role(Persistent):
 
     def create(self):
         """get a database connection and create role"""
+        pass
 
     def update(self):
-        """ get a database connection and update role"""
+        """get a database connection and update role"""
+        pass
