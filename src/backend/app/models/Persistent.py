@@ -9,7 +9,7 @@ class Persistent(object):
     createdBy = Column(UUID(as_uuid = True), nullable=True)
     lastModifiedOn = Column(DateTime, nullable=True, default=None)
     lastModifiedBy = Column(UUID(as_uuid = True), nullable=True, default=None)
-    version = Column(Integer, autoincrement=True)
+    version = Column(Integer)
     effectiveFrom = Column(Date, nullable=True, default=None)
     isEnabled = Column(Boolean)
     id = Column(UUID(as_uuid = True), primary_key=True, unique=True, default=uuid4)

@@ -26,25 +26,26 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         self.model = model
 
-    def read(self, db: Session, id: Any) -> Optional[ModelType]:
-        return db.get(self.model, id)
+    def read(self, session: Session, id: Any) -> Optional[ModelType]:
+        return session.get(self.model, id)
 
     def read_all(
-        self, db: Session, *, skip: int = 0, limit: int = 100
+        self, session: Session, *, skip: int = 0, limit: int = 100
     ) -> List[ModelType]:
-        return db.query(self.model).offset(skip).limit(limit).all()
+        return session.query(self.model).offset(skip).limit(limit).all()
 
-    def create(self, db: Session, *, obj_in: CreateSchemaType) -> ModelType:
+    def create(self, session: Session, *, obj_in: CreateSchemaType) -> ModelType:
         obj_in_data = jsonable_encoder(obj_in)
         db_obj = self.model(**obj_in_data) 
-        db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
+        session.add(db_obj)
+        session.commit()
+        session.refresh(db_obj)
         return db_obj
 
-    def update(self,db: Session, *, obj_id: str, obj_in: Union[UpdateSchemaType, Dict[str, Any]]) -> ModelType:
+    def update(self, session: Session, *, obj_id: str, obj_in: Union[UpdateSchemaType, Dict[str, Any]]) -> ModelType:
         restricted = ["createdBy", "createdOn", "id", "version", "lastModifiedBy", "lastModifiedOn"] #immutable attributes once created
-        db_obj = db.get(self.model, obj_id)
+        allowed = []
+        db_obj = session.get(self.model, obj_id)
         obj_data = jsonable_encoder(db_obj)
         if isinstance(obj_in, dict):
             update_data = obj_in
@@ -55,16 +56,16 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
                 setattr(db_obj, field, update_data[field])
         setattr(db_obj, "lastModifiedOn", datetime.now())
         curr_version = getattr(db_obj, "version")
-        if getattr(db.get(self.model, obj_id), "version") != curr_version:
+        if getattr(session.get(self.model, obj_id), "version") != curr_version:
             return {"message": "Version Mismatch Error"} #return mismatch error
         setattr(db_obj, "version", curr_version + 1)
-        db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
+        session.add(db_obj)
+        session.commit()
+        session.refresh(db_obj)
         return db_obj
 
-    def delete(self, db: Session, *, id: str) -> ModelType:
-        obj = db.query(self.model).get(id)
-        db.delete(obj)
-        db.commit()
+    def delete(self, session: Session, *, id: str) -> ModelType:
+        obj = session.query(self.model).get(id)
+        session.delete(obj)
+        session.commit()
         return obj

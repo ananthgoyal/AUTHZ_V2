@@ -8,9 +8,10 @@ from pydantic import Field
 class Role(Persistent):
     """Is an organized set of permissions intended to reflect an organization function."""
     name: str = "" #Name of the Role
-    #permissions: List[int] = [] #List of all unique Int ID's of permissions the role contains
     tags: List[str] = [] #List of strings indicating all associated tags with role
     description: str = "" #Description of the role
+
+     #permissions: List[int] = [] #List of all unique Int ID's of permissions the role contains
 
     class Config:
         orm_mode = True
