@@ -13,9 +13,6 @@ from typing import List
 from crud.crud_role import CRUD_Role
 from crud.base import CRUDBase
 
-#from models.Permission import Permission
-
-
 app = FastAPI()
 session = SessionLocal()
 
