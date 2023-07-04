@@ -1,4 +1,5 @@
 from datetime import datetime
+from fastapi import FastAPI, HTTPException
 from db.base_class import Base  
 from models.Role import Role
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
@@ -27,8 +28,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self.model = model
 
     def read(self, session: Session, id: Any) -> Optional[ModelType]:
-        return session.get(self.model, id)
-
+        obj = session.get(self.model, id)
+        if obj is None:
+            raise HTTPException(status_code = 404, detail = "Inputted ID does not match any existing role")
+        return obj
     def read_all(
         self, session: Session, *, skip: int = 0, limit: int = 100
     ) -> List[ModelType]:
@@ -46,6 +49,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         restricted = ["createdBy", "createdOn", "id", "version", "lastModifiedBy", "lastModifiedOn"] #immutable attributes once created
         allowed = []
         db_obj = session.get(self.model, obj_id)
+        if db_obj is None:
+            raise HTTPException(status_code = 404, detail = "ID does not match any existing role")
         obj_data = jsonable_encoder(db_obj)
         if isinstance(obj_in, dict):
             update_data = obj_in
@@ -57,7 +62,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         setattr(db_obj, "lastModifiedOn", datetime.now())
         curr_version = getattr(db_obj, "version")
         if getattr(session.get(self.model, obj_id), "version") != curr_version:
-            return {"message": "Version Mismatch Error"} #return mismatch error
+            raise HTTPException(status_code = 409, detail = "Version Number Conflict Error") #return mismatch error
         setattr(db_obj, "version", curr_version + 1)
         session.add(db_obj)
         session.commit()
@@ -66,6 +71,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     def delete(self, session: Session, *, id: str) -> ModelType:
         obj = session.query(self.model).get(id)
+        if obj is None:
+            raise HTTPException(status_code = 404, detail = "ID does not match any existing object")
         session.delete(obj)
         session.commit()
         return obj

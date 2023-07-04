@@ -1,3 +1,4 @@
+from os import stat
 import models
 from schemas.Role import Role
 from schemas.Persistent import Persistent
@@ -36,6 +37,6 @@ def update_role(role_guid:str, role: Role):
     return roleCrud.update(session, obj_id = role_guid, obj_in=role)
 
 """Delete a Role"""
-@router.delete('/roles/{role_guid}')
+@router.delete('/roles/{role_guid}', status_code = 200)
 def delete_role(role_guid: str):
     return roleCrud.delete(session, id = role_guid)
