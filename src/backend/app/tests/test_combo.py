@@ -13,10 +13,11 @@ import utils
 client = TestClient(app)
 
 role_id = None
+perm_id = None
 
 def test_create_role_with_perm():
     """Tests a valid creation of role object"""
-    global role_id
+    global role_id, perm_id
     response = client.post("/roles/", json={})
     assert response.status_code == 201
     resp = response.json()
@@ -38,22 +39,64 @@ def test_create_role_with_perm():
     assert resp["role"] == role_id
     assert resp["can_create"]
     assert not resp["can_read"]
+    perm_id = resp["id"]
 
-def test_read_role_with_perm():
-    """Tests a valid read of role object"""
 
-    pass
-
-def test_update_role_with_perm():
+def test_update_role_and_perm():
     """Tests a valid update of the role object"""
+    global role_id
+    response = client.put("/roles/" + role_id, json = {"description": "description changed", "isEnabled":False, 
+    "name" : "Ananth Goyal"})
+    assert response.status_code == 200
+    resp = response.json()
+    assert is_valid_date_format(resp["createdOn"])
+    assert resp["lastModifiedBy"] == None
+    assert resp["version"] == 2
+    assert resp["isEnabled"] == False
+    assert is_valid_uuid(resp["id"])
+    assert resp["tags"] == []
+    assert resp["name"] == "Ananth Goyal"
+    assert resp["description"] == "description changed"
+    assert resp["createdBy"] == None
+    assert is_valid_date_format(resp["lastModifiedOn"])
+    if resp["effectiveFrom"] is not None:
+        assert is_valid_date_format(resp["effectiveFrom"])
 
-    pass
+    response = client.put("/permissions/" + perm_id, json = {"can_create": True, "can_read_all":True, "can_share": True})
+    resp = response.json()
+    assert resp["can_create"]
+    assert resp["can_read_all"]
+    assert resp["can_share"]
+
+
 
 def test_delete_role_with_perm():
-    pass
+    """Test for deleting a role with permissions -> should delete role and all asscoiated permissions"""
+    global role_id
+    response = client.delete("/roles/" + role_id)
+    assert response.status_code == 200
 
-def test_error_read_404():
-    pass
+    resp = response.json()
+    assert is_valid_date_format(resp["createdOn"])
+    assert resp["lastModifiedBy"] == None
+    assert resp["version"] == 2
+    assert resp["isEnabled"] == False
+    assert is_valid_uuid(resp["id"])
+    assert resp["tags"] == []
+    assert resp["name"] == "Ananth Goyal"
+    assert resp["description"] == "description changed"
+    assert resp["createdBy"] == None
+    assert is_valid_date_format(resp["lastModifiedOn"])
+    if resp["effectiveFrom"] is not None:
+        assert is_valid_date_format(resp["effectiveFrom"])
+    response = client.get("/roles/" + role_id)
+    assert response.status_code == 404
+
+    response = client.get("/permissions/" + perm_id)
+    assert response.status_code == 404
+    
+
+
 
 def test_error_assign_invalid_role():
     """Test for assigning a permission to a role that DNE"""
@@ -75,7 +118,7 @@ def test_error_assign_invalid_role_update():
 
     response = client.put("/permissions/" + perm_id, json={"role" : "11111111-1111-1111-1111-111111111111"})
     assert response.status_code == 404
-    
+
 
 
 

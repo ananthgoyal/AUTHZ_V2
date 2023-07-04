@@ -13,9 +13,6 @@ import utils
 client = TestClient(app)
 
 
-def test_error_read_404():
-    pass
-
 
 
 

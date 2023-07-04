@@ -1,4 +1,3 @@
-from crud.crud_role import CRUD_Role
 from db.base_class import Base  
 from models.Permission import Permission
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
@@ -12,11 +11,13 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from db.base_class import Base
+from crud.crud_role import CRUD_Role
+
+roleCrud = CRUD_Role()
 
 ModelType = TypeVar("ModelType", bound=Base)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
-roleCrud = CRUD_Role()
 
 
 class CRUD_Permission(CRUDBase):
@@ -45,8 +46,9 @@ class CRUD_Permission(CRUDBase):
             update_data = obj_in
         else:
             update_data = obj_in.dict(exclude_unset=True)
-        role_id = update_data["role"]
-        roleCrud.read(session, role_id) #check if role is valid and stop if invalid
+        if "role" in update_data:
+            role_id = update_data["role"]
+            roleCrud.read(session, role_id) #check if role is valid and stop if invalid
         for field in obj_data:
             if field in update_data and field not in restricted: #bypass any attempt to change immutable attributes
                 setattr(db_obj, field, update_data[field])

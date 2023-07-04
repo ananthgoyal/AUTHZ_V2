@@ -104,7 +104,7 @@ def test_error_read_404():
     response = client.get("/roles/11111111-1111-1111-1111-111111111111")
     assert response.status_code == 404
 
-def test_error_delete_404():
+def test_error_update_404():
     """Tests an invalid delete request because ID doesn't exist"""
     response = client.put("/roles/" + empty_id, json={})
     assert response.status_code == 404
