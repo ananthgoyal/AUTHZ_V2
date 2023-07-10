@@ -1,7 +1,7 @@
 from db.base_class import Base  
 from models.Role import Role
-from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
-from crud.base import CRUDBase
+from typing import Any, Dict, List, Optional, Type, TypeVar, Union
+from repositories.base import CRUDBase
 import models
 from fastapi import FastAPI, HTTPException
 
@@ -15,7 +15,7 @@ CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 
 
-class CRUD_Role(CRUDBase):
+class RoleRepository(CRUDBase):
     
     def __init__(self):
         super().__init__(models.Role.Role)

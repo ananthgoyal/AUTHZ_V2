@@ -6,13 +6,13 @@ from fastapi import FastAPI, Request, Depends, Form, status, HTTPException, APIR
 from fastapi.encoders import jsonable_encoder
 from db.session import Base, engine
 from db.session import SessionLocal
-from crud.crud_permission import CRUD_Permission
+from repositories.PermissionRepository import PermissionRepository
 from typing import List
 
 
 session = SessionLocal()
 router = APIRouter()
-permCrud = CRUD_Permission()
+permCrud = PermissionRepository()
 
 
 """Create a Permission"""

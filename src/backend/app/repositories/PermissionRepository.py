@@ -1,7 +1,7 @@
 from db.base_class import Base  
 from models.Permission import Permission
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
-from crud.base import CRUDBase
+from repositories.base import CRUDBase
 from fastapi import FastAPI, HTTPException
 import models
 from datetime import datetime
@@ -11,16 +11,16 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from db.base_class import Base
-from crud.crud_role import CRUD_Role
+from repositories.RoleRepository import RoleRepository
 
-roleCrud = CRUD_Role()
+roleCrud = RoleRepository()
 
 ModelType = TypeVar("ModelType", bound=Base)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 
 
-class CRUD_Permission(CRUDBase):
+class PermissionRepository(CRUDBase):
     
     def __init__(self):
         super().__init__(models.Permission.Permission)

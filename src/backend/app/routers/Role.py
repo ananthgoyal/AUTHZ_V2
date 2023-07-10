@@ -8,12 +8,12 @@ from fastapi.encoders import jsonable_encoder
 from db.session import Base, engine
 from db.session import SessionLocal
 from typing import List
-from crud.crud_role import CRUD_Role
+from repositories.RoleRepository import RoleRepository
 session = SessionLocal()
 
 
 router = APIRouter()
-roleCrud = CRUD_Role()
+roleCrud = RoleRepository()
 
 
 """Create a Role"""
